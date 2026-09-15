@@ -36,26 +36,28 @@ export default function HomeScreen() {
         <Text style={styles.precio}>$15.500</Text>
       </View>
 
-      <Pressable
-        style={styles.boton}
-        onPress={() => router.push('/menu')}
-      >
-        <Text style={styles.botonTexto}>Ver menú completo</Text>
-      </Pressable>
+      <View style={styles.filaBotones}>
+        <Pressable
+          style={styles.botonMini}
+          onPress={() => router.push('/menu')}
+        >
+          <Text style={styles.botonMiniTexto}>Menú</Text>
+        </Pressable>
 
-      <Pressable
-        style={styles.botonSecundario}
-        onPress={() => router.push('/imagenes')}
-      >
-        <Text style={styles.botonSecundarioTexto}>Galería de Imágenes</Text>
-      </Pressable>
+        <Pressable
+          style={styles.botonMini}
+          onPress={() => router.push('/contacto')}
+        >
+          <Text style={styles.botonMiniTexto}>Contacto</Text>
+        </Pressable>
 
-      <Pressable
-        style={styles.botonSecundario}
-        onPress={() => router.push('/contacto')}
-      >
-        <Text style={styles.botonSecundarioTexto}>Contacto</Text>
-      </Pressable>
+        <Pressable
+          style={styles.botonMini}
+          onPress={() => router.push('/formulario-inicial')}
+        >
+          <Text style={styles.botonMiniTexto}>Registro</Text>
+        </Pressable>
+      </View>
     </ScrollView>
   );
 }
@@ -116,28 +118,28 @@ const styles = StyleSheet.create({
     color: '#E64A19',
     marginTop: 10,
   },
-  boton: {
-    backgroundColor: '#BF360C',
-    paddingVertical: 16,
-    borderRadius: 15,
+
+  filaBotones: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    width: '100%',
     marginTop: 15,
   },
-  botonTexto: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  botonSecundario: {
-    borderWidth: 1,
-    borderColor: '#BF360C',
-    paddingVertical: 16,
+  botonMini: {
+    backgroundColor: '#BF360C',
+    paddingVertical: 12,
+    paddingHorizontal: 4,
     borderRadius: 15,
+    flex: 1,
+    marginHorizontal: 4,
     alignItems: 'center',
-    marginTop: 12,
+    justifyContent: 'center',
   },
-  botonSecundarioTexto: {
-    color: '#BF360C',
+  botonMiniTexto: {
+    color: '#FFFFFF',
+    fontSize: 12,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
