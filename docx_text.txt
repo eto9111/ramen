@@ -1,0 +1,68 @@
+﻿Objetivo del laboratorio
+Construir una aplicaciÃ³n mÃ³vil organizada por rutas usando Expo Router. La aplicaciÃ³n tendrÃ¡ una interfaz principal amigable, un formulario de registro, una galerÃ­a de imÃ¡genes, una pantalla de contacto y una pantalla de resultados para visualizar la informaciÃ³n enviada desde el formulario.
+Al finalizar, el estudiante podrÃ¡
+Crear rutas mediante archivos dentro de la carpeta app.
+Navegar entre pantallas con useRouter() y router.push().
+Capturar informaciÃ³n mediante TextInput y useState().
+Enviar parÃ¡metros entre pantallas y recuperarlos con useLocalSearchParams().
+Mostrar imÃ¡genes mediante el componente Image.
+Organizar una interfaz con colores pastel, tarjetas y jerarquÃ­a visual.
+Estructura final del proyecto
+PARTE 1. Preparar la imagen principal
+Paso 1.1. Crear o revisar la carpeta assets
+En la raÃ­z del proyecto cree una carpeta llamada assets si todavÃ­a no existe.
+Paso 1.2. Agregar una imagen de portada
+Guarde dentro de assets una imagen horizontal con el nombre exacto:
+PARTE 2. Configurar las rutas
+Paso 2.1. Abrir app/_layout.tsx
+Este archivo registra las pantallas disponibles en la aplicaciÃ³n y configura el encabezado general.
+Â¿QuÃ© hace este cÃ³digo?
+Stack organiza las pantallas de la aplicaciÃ³n.
+Cada Stack.Screen registra una ruta.
+name debe coincidir con el nombre del archivo sin la extensiÃ³n.
+screenOptions permite aplicar un estilo general al encabezado.
+PARTE 3. Crear una pantalla principal tipo app real
+Paso 3.1. Abrir app/index.tsx
+Esta serÃ¡ la pantalla de entrada de la Coffee App. TendrÃ¡ una imagen principal de cafÃ©, saludo de bienvenida, tarjetas de navegaciÃ³n y una combinaciÃ³n visual de tonos cafÃ© con rosa pastel.
+Â¿QuÃ© observar en esta pantalla?
+La imagen principal se carga desde internet mediante la propiedad uri del componente Image.
+OpcionMenu es un componente reutilizable que recibe icono, tÃ­tulo, descripciÃ³n y una acciÃ³n.
+useRouter() permite navegar desde la pantalla principal.
+La paleta combina cafÃ©, crema, blanco y rosa pastel para mantener una estÃ©tica cÃ¡lida de cafeterÃ­a.
+router.push('/formulario') abre la ruta formulario.tsx.
+PARTE 4. Crear la pantalla de formulario
+Paso 4.1. Crear app/formulario.tsx
+Esta pantalla captura nombre, correo, telÃ©fono y ciudad. DespuÃ©s envÃ­a la informaciÃ³n a la ruta resultado.
+PARTE 5. Mostrar los datos enviados
+Paso 5.1. Crear app/resultado.tsx
+useLocalSearchParams() permite recuperar los parÃ¡metros enviados mediante router.push(). En este caso se reciben nombre, correo, telÃ©fono y ciudad.
+PARTE 6. Crear la galerÃ­a de imÃ¡genes
+Paso 6.1. Crear app/imagenes.tsx
+PARTE 7. Crear la pantalla de contacto
+Paso 7.1. Crear app/contacto.tsx
+PARTE 8. Ejecutar y comprobar la aplicaciÃ³n
+Paso 8.1. Iniciar Expo
+Con el emulador Android abierto, presione la tecla a en la terminal para ejecutar la aplicaciÃ³n.
+Paso 8.2. Comprobar el flujo
+La app inicia en index.tsx.
+Desde Inicio se puede entrar a Formulario, GalerÃ­a y Contacto.
+El formulario no permite enviar campos vacÃ­os.
+Al enviar el formulario se abre resultado.tsx.
+resultado.tsx muestra exactamente los datos ingresados.
+El botÃ³n Volver al inicio regresa a la pantalla principal.
+La galerÃ­a carga las imÃ¡genes correctamente.
+Flujo de navegaciÃ³n esperado
+PARTE 9. Conceptos que debe identificar
+PARTE 10. Preguntas de cierre
+1. Â¿QuÃ© relaciÃ³n existe entre el nombre de un archivo dentro de app y la ruta que genera Expo Router?
+2. Â¿QuÃ© diferencia existe entre router.push() y router.replace()?
+3. Â¿Para quÃ© se utiliza useLocalSearchParams()?
+4. Â¿QuÃ© funciÃ³n cumple useState() dentro del formulario?
+5. Â¿CuÃ¡l es la diferencia entre una imagen local y una imagen cargada mediante uri?
+Entrega
+Captura de la pantalla principal.
+Captura del formulario.
+Captura de la pantalla de resultados con datos diligenciados.
+Captura de la galerÃ­a.
+Captura de la pantalla de contacto.
+CÃ³digo fuente completo del proyecto.
