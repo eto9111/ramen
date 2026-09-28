@@ -20,6 +20,7 @@ export default function RootLayout() {
       <Stack.Screen name="formulario" options={{ title: 'Realizar Pedido' }} />
       <Stack.Screen name="resultado" options={{ title: 'Resumen del Pedido' }} />
       <Stack.Screen name="imagenes" options={{ title: 'Galería de Ramen' }} />
+      <Stack.Screen name="registros" options={{ title: 'Ramen Lovers' }} />
     </Stack>
   );
 }

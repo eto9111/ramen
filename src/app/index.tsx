@@ -58,6 +58,13 @@ export default function HomeScreen() {
           <Text style={styles.botonMiniTexto}>Registro</Text>
         </Pressable>
       </View>
+
+      <Pressable
+        style={styles.boton}
+        onPress={() => router.push('/registros')}
+      >
+        <Text style={styles.botonTexto}>Ramen Lovers</Text>
+      </Pressable>
     </ScrollView>
   );
 }
@@ -118,7 +125,18 @@ const styles = StyleSheet.create({
     color: '#E64A19',
     marginTop: 10,
   },
-
+  boton: {
+    backgroundColor: '#BF360C',
+    paddingVertical: 16,
+    borderRadius: 15,
+    alignItems: 'center',
+    marginTop: 15,
+  },
+  botonTexto: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
   filaBotones: {
     flexDirection: 'row',
     justifyContent: 'space-between',

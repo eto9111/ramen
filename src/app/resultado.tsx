@@ -4,7 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 
 export default function ResultadoScreen() {
   const params = useLocalSearchParams();
-  const { producto, cantidad, total, nombre, correo, telefono, ciudad } = params;
+  const { producto, cantidad, total, nombre, correo, telefono, ciudad, id, ramenFavorito, tipoPreparacion } = params;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -14,6 +14,10 @@ export default function ResultadoScreen() {
       <View style={styles.tarjeta}>
         <Text style={styles.seccionTitulo}>Detalles del Pedido</Text>
         
+        <View style={styles.fila}>
+          <Text style={styles.label}>Registro #:</Text>
+          <Text style={styles.valor}>{id}</Text>
+        </View>
         <View style={styles.fila}>
           <Text style={styles.label}>Producto:</Text>
           <Text style={styles.valor}>{producto}</Text>
@@ -29,7 +33,7 @@ export default function ResultadoScreen() {
       </View>
 
       <View style={styles.tarjeta}>
-        <Text style={styles.seccionTitulo}>Datos de Envío</Text>
+        <Text style={styles.seccionTitulo}>Datos del Cliente</Text>
         
         <View style={styles.fila}>
           <Text style={styles.label}>Correo:</Text>
@@ -43,10 +47,22 @@ export default function ResultadoScreen() {
           <Text style={styles.label}>Ciudad:</Text>
           <Text style={styles.valor}>{ciudad}</Text>
         </View>
+        <View style={styles.fila}>
+          <Text style={styles.label}>Ramen Favorito:</Text>
+          <Text style={styles.valor}>{ramenFavorito}</Text>
+        </View>
+        <View style={styles.fila}>
+          <Text style={styles.label}>Tipo Preparación:</Text>
+          <Text style={styles.valor}>{tipoPreparacion}</Text>
+        </View>
       </View>
 
-      <Pressable style={styles.boton} onPress={() => router.push('/')}>
-        <Text style={styles.botonTexto}>Volver al inicio</Text>
+      <Pressable style={styles.boton} onPress={() => router.push('/registros')}>
+        <Text style={styles.botonTexto}>Ver Ramen Lovers</Text>
+      </Pressable>
+
+      <Pressable style={[styles.boton, { backgroundColor: '#FFCCBC', marginTop: 10 }]} onPress={() => router.push('/')}>
+        <Text style={[styles.botonTexto, { color: '#BF360C' }]}>Volver al inicio</Text>
       </Pressable>
     </ScrollView>
   );

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Pressable, ScrollView, Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Pressable, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { supabase } from '../lib/supabase';
 
 export default function FormularioScreen() {
   const { producto, cantidad, total } = useLocalSearchParams();
@@ -9,25 +10,63 @@ export default function FormularioScreen() {
   const [correo, setCorreo] = useState('');
   const [telefono, setTelefono] = useState('');
   const [ciudad, setCiudad] = useState('');
+  const [ramenFavorito, setRamenFavorito] = useState('');
+  const [tipoPreparacion, setTipoPreparacion] = useState('');
+  const [guardando, setGuardando] = useState(false);
 
-  const enviarFormulario = () => {
-    if (!nombre || !correo || !telefono || !ciudad) {
+  const enviarFormulario = async () => {
+    if (!nombre || !correo || !telefono || !ciudad || !ramenFavorito || !tipoPreparacion) {
       Alert.alert('Error', 'Por favor, completa todos los campos.');
       return;
     }
 
-    router.push({
-      pathname: '/resultado',
-      params: {
-        producto,
-        cantidad,
-        total,
-        nombre,
-        correo,
-        telefono,
-        ciudad
+    try {
+      setGuardando(true);
+      
+      const { data, error } = await supabase
+        .from('clientes_ramen')
+        .insert([
+          {
+            nombre,
+            correo,
+            telefono,
+            ciudad,
+            ramen_favorito: ramenFavorito,
+            tipo_preparacion: tipoPreparacion,
+          },
+        ])
+        .select();
+
+      if (error) {
+        console.log("Error Supabase:", error);
+        Alert.alert('Error', error.message);
+        return;
       }
-    });
+
+      const registro = data?.[0];
+
+      router.push({
+        pathname: '/resultado',
+        params: {
+          producto,
+          cantidad,
+          total,
+          id: String(registro.id),
+          nombre: registro.nombre,
+          correo: registro.correo,
+          telefono: registro.telefono,
+          ciudad: registro.ciudad,
+          ramenFavorito: registro.ramen_favorito,
+          tipoPreparacion: registro.tipo_preparacion
+        }
+      });
+
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Error', 'No fue posible guardar la información');
+    } finally {
+      setGuardando(false);
+    }
   };
 
   return (
@@ -70,8 +109,32 @@ export default function FormularioScreen() {
           onChangeText={setCiudad}
         />
 
-        <Pressable style={styles.boton} onPress={enviarFormulario}>
-          <Text style={styles.botonTexto}>Confirmar Pedido</Text>
+        <Text style={styles.label}>Ramen favorito</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Ej: Tonkotsu"
+          value={ramenFavorito}
+          onChangeText={setRamenFavorito}
+        />
+
+        <Text style={styles.label}>Tipo de preparación</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Ej: Fideos firmes, caldo espeso"
+          value={tipoPreparacion}
+          onChangeText={setTipoPreparacion}
+        />
+
+        <Pressable 
+          style={styles.boton} 
+          onPress={enviarFormulario}
+          disabled={guardando}
+        >
+          {guardando ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={styles.botonTexto}>Guardar en Supabase</Text>
+          )}
         </Pressable>
 
         <Pressable style={styles.botonCancelar} onPress={() => router.back()}>
