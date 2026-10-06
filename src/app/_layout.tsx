@@ -1,35 +1,34 @@
-import { Stack } from 'expo-router';
-import { Image, StyleSheet } from 'react-native';
+import { Stack } from "expo-router";
+import { ActivityIndicator, View } from "react-native";
+import { AuthProvider, useAuth } from "../context/AuthContext";
 
-function LogoCircular() {
+function RootNavigator() {
+  const { session, cargando } = useAuth();
+
+  if (cargando) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#C87591" />
+      </View>
+    );
+  }
+
   return (
-    <Image 
-      source={require('../../assets/images/logo.png')} 
-      style={styles.logo} 
-    />
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Protected guard={!session}>
+        <Stack.Screen name="(auth)" />
+      </Stack.Protected>
+      <Stack.Protected guard={!!session}>
+        <Stack.Screen name="(app)" />
+      </Stack.Protected>
+    </Stack>
   );
 }
 
 export default function RootLayout() {
   return (
-    <Stack screenOptions={{ headerRight: () => <LogoCircular /> }}>
-      <Stack.Screen name="index" options={{ title: 'Ramen App' }} />
-      <Stack.Screen name="menu" options={{ title: 'Nuestro menú' }} />
-      <Stack.Screen name="contacto" options={{ title: 'Contacto' }} />
-      <Stack.Screen name="producto/[id]" options={{ title: 'Detalle del Ramen' }} />
-      <Stack.Screen name="formulario" options={{ title: 'Realizar Pedido' }} />
-      <Stack.Screen name="resultado" options={{ title: 'Resumen del Pedido' }} />
-      <Stack.Screen name="imagenes" options={{ title: 'Galería de Ramen' }} />
-      <Stack.Screen name="registros" options={{ title: 'Ramen Lovers' }} />
-    </Stack>
+    <AuthProvider>
+      <RootNavigator />
+    </AuthProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  logo: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 15,
-  }
-});

@@ -6,7 +6,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { supabase } from "../lib/supabase";
+import { supabase } from "../../../lib/supabase";
 
 export default function Registros() {
   const [registros, setRegistros] = useState<any[]>([]);

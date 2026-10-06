@@ -7,8 +7,16 @@ import {
 } from 'react-native';
 
 import { router } from 'expo-router';
+import { supabase } from "../../lib/supabase";
 
 export default function HomeScreen() {
+  const cerrarSesion = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      alert(error.message);
+    }
+  };
+
   return (
     <ScrollView
       style={styles.container}
@@ -64,6 +72,13 @@ export default function HomeScreen() {
         onPress={() => router.push('/registros')}
       >
         <Text style={styles.botonTexto}>Ramen Lovers</Text>
+      </Pressable>
+
+      <Pressable
+        style={styles.botonCerrar}
+        onPress={cerrarSesion}
+      >
+        <Text style={styles.textoCerrar}>Cerrar sesión</Text>
       </Pressable>
     </ScrollView>
   );
@@ -159,5 +174,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  botonCerrar: {
+    backgroundColor: "#8E3B46",
+    padding: 14,
+    borderRadius: 14,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  textoCerrar: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
   },
 });
