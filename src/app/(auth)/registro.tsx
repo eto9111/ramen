@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  ActivityIndicator, Alert, Pressable, StyleSheet,
+  ActivityIndicator, Alert, Image, Pressable, StyleSheet,
   Text, TextInput, View
 } from "react-native";
 import { useRouter } from "expo-router";
@@ -44,8 +44,12 @@ export default function Registro() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logo}>🍜</Text>
+      <Image
+        source={require("../../../assets/images/logo.png")}
+        style={styles.logo}
+      />
       <Text style={styles.titulo}>Crear cuenta</Text>
+      <Text style={styles.subtitulo}>Regístrate en Ramen App</Text>
       <TextInput
         style={styles.input}
         placeholder="Correo electrónico"
@@ -81,8 +85,9 @@ export default function Registro() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", padding: 24, backgroundColor: "#FFF8DC" },
-  logo: { fontSize: 56, textAlign: "center", marginBottom: 10 },
-  titulo: { fontSize: 32, fontWeight: "bold", color: "#3E2723", textAlign: "center", marginBottom: 24 },
+  logo: { width: 90, height: 90, borderRadius: 45, alignSelf: "center", marginBottom: 15, borderWidth: 2, borderColor: "#BF360C" },
+  titulo: { fontSize: 32, fontWeight: "bold", color: "#3E2723", textAlign: "center", marginBottom: 6 },
+  subtitulo: { color: "#5D4037", textAlign: "center", marginBottom: 24, fontSize: 16 },
   input: { backgroundColor: "#FFFFFF", borderWidth: 1, borderColor: "#D84315", borderRadius: 14, padding: 14, marginBottom: 14, color: "#3E2723" },
   boton: { backgroundColor: "#BF360C", padding: 16, borderRadius: 14, alignItems: "center", marginTop: 10 },
   botonTexto: { color: "#FFFFFF", fontWeight: "bold", fontSize: 16 },

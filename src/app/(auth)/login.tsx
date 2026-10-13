@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  ActivityIndicator, Alert, Pressable, StyleSheet,
+  ActivityIndicator, Alert, Image, Pressable, StyleSheet,
   Text, TextInput, View
 } from "react-native";
 import { useRouter } from "expo-router";
@@ -36,7 +36,10 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logo}>🍜</Text>
+      <Image
+        source={require("../../../assets/images/logo.png")}
+        style={styles.logo}
+      />
       <Text style={styles.titulo}>Ramen App</Text>
       <Text style={styles.subtitulo}>Inicia sesión para continuar</Text>
 
@@ -75,7 +78,7 @@ export default function Login() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", padding: 24, backgroundColor: "#FFF8DC" },
-  logo: { fontSize: 60, textAlign: "center", marginBottom: 10 },
+  logo: { width: 90, height: 90, borderRadius: 45, alignSelf: "center", marginBottom: 15, borderWidth: 2, borderColor: "#BF360C" },
   titulo: { fontSize: 32, fontWeight: "bold", color: "#3E2723", textAlign: "center" },
   subtitulo: { color: "#5D4037", textAlign: "center", marginBottom: 28, fontSize: 16 },
   input: { backgroundColor: "#FFFFFF", borderWidth: 1, borderColor: "#D84315", borderRadius: 14, padding: 14, marginBottom: 14, color: "#3E2723" },
