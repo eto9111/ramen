@@ -91,7 +91,7 @@ export default function MenuScreen() {
 
       <Pressable
         style={styles.regresar}
-        onPress={() => router.back()}
+        onPress={() => router.replace('/')}
       >
         <Text style={styles.regresarTexto}>Regresar al inicio</Text>
       </Pressable>

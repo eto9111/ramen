@@ -61,7 +61,7 @@ export default function ResultadoScreen() {
         <Text style={styles.botonTexto}>Ver Ramen Lovers</Text>
       </Pressable>
 
-      <Pressable style={[styles.boton, { backgroundColor: '#FFCCBC', marginTop: 10 }]} onPress={() => router.push('/')}>
+      <Pressable style={[styles.boton, { backgroundColor: '#FFCCBC', marginTop: 10 }]} onPress={() => router.replace('/')}>
         <Text style={[styles.botonTexto, { color: '#BF360C' }]}>Volver al inicio</Text>
       </Pressable>
     </ScrollView>

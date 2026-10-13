@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Pressable, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { supabase } from '../../../lib/supabase';
+import { supabase } from '../../lib/supabase';
 
 export default function FormularioScreen() {
   const { producto, cantidad, total } = useLocalSearchParams();
@@ -48,16 +48,16 @@ export default function FormularioScreen() {
       router.push({
         pathname: '/resultado',
         params: {
-          producto,
-          cantidad,
-          total,
-          id: String(registro.id),
-          nombre: registro.nombre,
-          correo: registro.correo,
-          telefono: registro.telefono,
-          ciudad: registro.ciudad,
-          ramenFavorito: registro.ramen_favorito,
-          tipoPreparacion: registro.tipo_preparacion
+          producto: (producto as string) || ramenFavorito,
+          cantidad: (cantidad as string) || '1',
+          total: (total as string) || '18000',
+          id: String(registro?.id || Date.now()),
+          nombre: registro?.nombre || nombre,
+          correo: registro?.correo || correo,
+          telefono: registro?.telefono || telefono,
+          ciudad: registro?.ciudad || ciudad,
+          ramenFavorito: registro?.ramen_favorito || ramenFavorito,
+          tipoPreparacion: registro?.tipo_preparacion || tipoPreparacion
         }
       });
 
@@ -69,10 +69,14 @@ export default function FormularioScreen() {
     }
   };
 
+  const subtituloTexto = producto
+    ? `Ingresa tu información para confirmar el pedido de ${cantidad}x ${producto}`
+    : 'Ingresa tu información y preferencia para registrar tu pedido de ramen.';
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.titulo}>Tus Datos</Text>
-      <Text style={styles.subtitulo}>Ingresa tu información para confirmar el pedido de {cantidad}x {producto}</Text>
+      <Text style={styles.subtitulo}>{subtituloTexto}</Text>
 
       <View style={styles.formulario}>
         <Text style={styles.label}>Nombre completo</Text>

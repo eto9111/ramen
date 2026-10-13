@@ -7,9 +7,9 @@ export default function ProductoScreen() {
   const [cantidad, setCantidad] = useState(1);
 
   const imagenes: any = {
-    '1': require('../../../assets/images/tonkotsu.jpg'),
-    '2': require('../../../assets/images/shoyu.png'),
-    '3': require('../../../assets/images/miso.jpg'),
+    '1': require('../../../../assets/images/tonkotsu.jpg'),
+    '2': require('../../../../assets/images/shoyu.png'),
+    '3': require('../../../../assets/images/miso.jpg'),
   };
   const imagenSeleccionada = imagenes[id as string];
 
@@ -53,6 +53,10 @@ export default function ProductoScreen() {
 
       <Pressable style={styles.botonComprar} onPress={hacerPedido}>
         <Text style={styles.botonTexto}>Realizar pedido</Text>
+      </Pressable>
+
+      <Pressable style={styles.boton} onPress={() => router.back()}>
+        <Text style={styles.botonTextoSecundario}>Volver al menú</Text>
       </Pressable>
     </ScrollView>
   );

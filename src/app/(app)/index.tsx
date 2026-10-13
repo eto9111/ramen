@@ -32,17 +32,43 @@ export default function HomeScreen() {
 
       <Text style={styles.seccionTitulo}>Recomendados</Text>
 
-      <View style={styles.tarjeta}>
+      <Pressable
+        style={styles.tarjeta}
+        onPress={() =>
+          router.push({
+            pathname: '/producto/[id]',
+            params: {
+              id: '1',
+              nombre: 'Tonkotsu Ramen',
+              precio: '18000',
+              descripcion: 'Caldo de huesos de cerdo cocinado a fuego lento por horas, acompañado de chashu, huevo marinado y fideos frescos.',
+            },
+          })
+        }
+      >
         <Text style={styles.productoTitulo}>Tonkotsu Ramen</Text>
         <Text style={styles.productoDescripcion}>Caldo de cerdo rico y cremoso</Text>
         <Text style={styles.precio}>$18.000</Text>
-      </View>
+      </Pressable>
 
-      <View style={styles.tarjeta}>
+      <Pressable
+        style={styles.tarjeta}
+        onPress={() =>
+          router.push({
+            pathname: '/producto/[id]',
+            params: {
+              id: '2',
+              nombre: 'Shoyu Ramen',
+              precio: '15500',
+              descripcion: 'Un clásico ligero con caldo a base de salsa de soja, pollo, bambú, cebolleta y un huevo suave.',
+            },
+          })
+        }
+      >
         <Text style={styles.productoTitulo}>Shoyu Ramen</Text>
         <Text style={styles.productoDescripcion}>Caldo a base de salsa de soja</Text>
         <Text style={styles.precio}>$15.500</Text>
-      </View>
+      </Pressable>
 
       <View style={styles.filaBotones}>
         <Pressable
@@ -54,16 +80,23 @@ export default function HomeScreen() {
 
         <Pressable
           style={styles.botonMini}
-          onPress={() => router.push('/contacto')}
+          onPress={() => router.push('/imagenes')}
         >
-          <Text style={styles.botonMiniTexto}>Contacto</Text>
+          <Text style={styles.botonMiniTexto}>Galería</Text>
         </Pressable>
 
         <Pressable
           style={styles.botonMini}
-          onPress={() => router.push('/formulario-inicial')}
+          onPress={() => router.push('/formulario')}
         >
-          <Text style={styles.botonMiniTexto}>Registro</Text>
+          <Text style={styles.botonMiniTexto}>Pedido</Text>
+        </Pressable>
+
+        <Pressable
+          style={styles.botonMini}
+          onPress={() => router.push('/contacto')}
+        >
+          <Text style={styles.botonMiniTexto}>Contacto</Text>
         </Pressable>
       </View>
 
@@ -71,7 +104,7 @@ export default function HomeScreen() {
         style={styles.boton}
         onPress={() => router.push('/registros')}
       >
-        <Text style={styles.botonTexto}>Ramen Lovers</Text>
+        <Text style={styles.botonTexto}>Ramen Lovers (Registros)</Text>
       </Pressable>
 
       <Pressable

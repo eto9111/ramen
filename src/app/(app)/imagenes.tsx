@@ -4,9 +4,9 @@ import { router } from 'expo-router';
 
 export default function ImagenesScreen() {
   const imagenes = [
-    { id: '1', nombre: 'Tonkotsu Ramen', src: require('../../assets/images/tonkotsu.jpg') },
-    { id: '2', nombre: 'Shoyu Ramen', src: require('../../assets/images/shoyu.png') },
-    { id: '3', nombre: 'Miso Ramen', src: require('../../assets/images/miso.jpg') },
+    { id: '1', nombre: 'Tonkotsu Ramen', src: require('../../../assets/images/tonkotsu.jpg') },
+    { id: '2', nombre: 'Shoyu Ramen', src: require('../../../assets/images/shoyu.png') },
+    { id: '3', nombre: 'Miso Ramen', src: require('../../../assets/images/miso.jpg') },
   ];
 
   return (
@@ -20,6 +20,10 @@ export default function ImagenesScreen() {
           <Text style={styles.nombre}>{img.nombre}</Text>
         </View>
       ))}
+
+      <Pressable style={styles.boton} onPress={() => router.replace('/')}>
+        <Text style={styles.botonTexto}>Volver al inicio</Text>
+      </Pressable>
     </ScrollView>
   );
 }
