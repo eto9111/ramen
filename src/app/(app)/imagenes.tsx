@@ -4,25 +4,27 @@ import { router } from 'expo-router';
 
 export default function ImagenesScreen() {
   const imagenes = [
-    { id: '1', nombre: 'Tonkotsu Ramen', src: require('../../../assets/images/tonkotsu.jpg') },
-    { id: '2', nombre: 'Shoyu Ramen', src: require('../../../assets/images/shoyu.png') },
-    { id: '3', nombre: 'Miso Ramen', src: require('../../../assets/images/miso.jpg') },
+    { id: '1', nombre: 'Tonkotsu Ramen Tradicional', src: require('../../../assets/images/tonkotsu.jpg') },
+    { id: '2', nombre: 'Shoyu Ramen Clásico', src: require('../../../assets/images/shoyu.png') },
+    { id: '3', nombre: 'Miso Ramen Hokkaido', src: require('../../../assets/images/miso.jpg') },
+    { id: '4', nombre: 'Bogia Instant Noodles Beef Flavor', src: require('../../../assets/images/bogia-beef.jpg') },
+    { id: '5', nombre: 'Samyang Buldak Carbonara', src: require('../../../assets/images/buldak-carbonara.jpg') },
   ];
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.titulo}>Galería de Ramen</Text>
-      <Text style={styles.descripcion}>Descubre nuestros platillos en imágenes</Text>
+      <Text style={styles.descripcion}>Descubre nuestros 5 platillos y presentaciones</Text>
 
       {imagenes.map((img) => (
         <View key={img.id} style={styles.tarjeta}>
-          <Image source={img.src} style={styles.imagen} />
+          <Image source={img.src} style={styles.imagen} resizeMode="contain" />
           <Text style={styles.nombre}>{img.nombre}</Text>
         </View>
       ))}
 
       <Pressable style={styles.boton} onPress={() => router.replace('/')}>
-        <Text style={styles.botonTexto}>Volver al inicio</Text>
+        <Text style={styles.botonTexto}>← Volver al inicio</Text>
       </Pressable>
     </ScrollView>
   );
@@ -34,6 +36,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF8DC',
     alignItems: 'center',
     padding: 20,
+    paddingBottom: 40,
   },
   titulo: {
     fontSize: 28,
@@ -42,13 +45,14 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   descripcion: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#5D4037',
     marginBottom: 20,
+    textAlign: 'center',
   },
   tarjeta: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 15,
+    borderRadius: 16,
     padding: 15,
     marginBottom: 20,
     alignItems: 'center',
@@ -58,23 +62,28 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: '#FFE0B2',
   },
   imagen: {
     width: '100%',
-    height: 200,
-    borderRadius: 10,
+    height: 220,
+    borderRadius: 12,
     marginBottom: 10,
+    backgroundColor: '#FAFAFA',
   },
   nombre: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: 'bold',
     color: '#BF360C',
+    textAlign: 'center',
   },
   boton: {
     borderWidth: 2,
     borderColor: '#BF360C',
+    backgroundColor: '#FFFFFF',
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: 'center',
     width: '100%',
     marginTop: 10,
@@ -83,5 +92,5 @@ const styles = StyleSheet.create({
     color: '#BF360C',
     fontWeight: 'bold',
     fontSize: 16,
-  }
+  },
 });

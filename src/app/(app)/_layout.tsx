@@ -10,17 +10,74 @@ function LogoCircular() {
   );
 }
 
-export default function AppLayout() {
+export default function Layout() {
   return (
     <Stack screenOptions={{ headerRight: () => <LogoCircular /> }}>
-      <Stack.Screen name="index" options={{ title: 'Ramen App' }} />
-      <Stack.Screen name="menu" options={{ title: 'Nuestro menú' }} />
-      <Stack.Screen name="contacto" options={{ title: 'Contacto' }} />
-      <Stack.Screen name="producto/[id]" options={{ title: 'Detalle del Ramen' }} />
-      <Stack.Screen name="formulario" options={{ title: 'Realizar Pedido' }} />
-      <Stack.Screen name="resultado" options={{ title: 'Resumen del Pedido' }} />
-      <Stack.Screen name="imagenes" options={{ title: 'Galería de Ramen' }} />
-      <Stack.Screen name="registros" options={{ title: 'Ramen Lovers' }} />
+      <Stack.Screen
+        name="index"
+        options={{
+          title: "Inicio",
+        }}
+      />
+      <Stack.Screen
+        name="formulario"
+        options={{
+          title: "Formulario",
+        }}
+      />
+      <Stack.Screen
+        name="resultado"
+        options={{
+          title: "Datos registrados",
+        }}
+      />
+      <Stack.Screen
+        name="imagenes"
+        options={{
+          title: "Galería",
+        }}
+      />
+      <Stack.Screen
+        name="contacto"
+        options={{
+          title: "Contacto",
+        }}
+      />
+      <Stack.Screen
+        name="menu"
+        options={{
+          title: "Nuestro menú",
+        }}
+      />
+      <Stack.Screen
+        name="registros"
+        options={{
+          title: "Ramen Lovers",
+        }}
+      />
+
+      {/* NUEVA PANTALLA: DETALLE */}
+      <Stack.Screen
+        name="detalle-item"
+        options={{
+          title: "Detalle del producto",
+        }}
+      />
+
+      {/* NUEVA PANTALLA: CATÁLOGO */}
+      <Stack.Screen
+        name="catalogo"
+        options={{
+          title: "Catálogo de Productos",
+        }}
+      />
+
+      <Stack.Screen
+        name="producto/[id]"
+        options={{
+          title: "Detalle del Ramen",
+        }}
+      />
     </Stack>
   );
 }
