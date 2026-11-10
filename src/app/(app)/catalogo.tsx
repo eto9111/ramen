@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -15,7 +14,6 @@ import {
 import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 
-/// Estructura de los productos de supabase
 export type Item = {
   codigo: string | number;
   titulo: string;
@@ -24,41 +22,41 @@ export type Item = {
   precio: number | null;
 };
 
-// Entidad con los 5 productos con información detallada
+// 5 productos base con informacion completa
 export const PRODUCTOS_BASE: Item[] = [
   {
     codigo: 1,
     titulo: 'Tonkotsu Ramen Tradicional',
-    descripcion: 'Caldo denso y cremoso de cerdo hervido durante 16 horas, fideos artesanales, panceta chashu marinada, huevo nitamago y alga nori.',
-    detalle: 'Especialidad de la casa con fondo de huesos de cerdo blanco a fuego lento, aceite de ajo negro aromático (mayu), brotes de bambú (menma), cebolleta fresca y chashu braseado.',
+    descripcion: 'Caldo de cerdo cocinado a fuego lento por 16 horas, fideos artesanales, chashu y huevo marinado.',
+    detalle: 'Preparado con fondo de cerdo blanco a fuego lento, aceite de ajo negro aromático, brotes de bambú, cebolleta fresca y chashu braseado.',
     precio: 18000,
   },
   {
     codigo: 2,
     titulo: 'Shoyu Ramen Clásico de Tokyo',
-    descripcion: 'Caldo límpido y profundo a base de soja fermentada artesanal, pollo de corral, menma crujiente y cebolleta fina.',
-    detalle: 'El clásico de Tokyo con caldo transparente elaborado con alga kombu, setas shiitake y tare de salsa shoyu añejada en barrica de cedro, con pollo tierno y huevo marinado en mirin.',
+    descripcion: 'Caldo ligero a base de salsa de soja fermentada, pollo de corral, bambú y cebolleta fina.',
+    detalle: 'Receta tradicional con caldo transparente elaborado con alga kombu, setas shiitake y salsa shoyu añejada, pechuga tierna y huevo suave.',
     precio: 15500,
   },
   {
     codigo: 3,
     titulo: 'Miso Ramen Hokkaido',
-    descripcion: 'Caldo aromático enriquecido con pasta de miso tostada de Hokkaido, mantequilla dulce, maíz tierno y carne picada.',
-    detalle: 'Originario de Sapporo, con base de pasta de miso rojo y blanco salteada al wok con jengibre fresco, ajo confitado, sésamo tostado, maíz dulce y una lágrima de mantequilla pura.',
+    descripcion: 'Caldo aromático con pasta de miso tostada, maíz tierno, mantequilla y carne picada.',
+    detalle: 'Originario de Sapporo, con pasta de miso salteada con jengibre fresco, ajo confitado, sésamo tostado, maíz dulce y mantequilla pura.',
     precio: 17000,
   },
   {
     codigo: 4,
     titulo: 'Bogia Instant Noodles Beef Flavor',
-    descripcion: 'Fideos instantáneos premium en bowl sabor carne de res especiada con trozos de vegetales deshidratados y caldo vigorizante.',
-    detalle: 'Bowl de fideos ondulados listos en 3 minutos. Incluye sobre de caldo concentrado de res estilo oriental con notas de anís estrella, cebolla de verdeo deshidratada, zanahoria y chile suave.',
+    descripcion: 'Fideos instantáneos en bowl con caldo especiado de res y vegetales deshidratados.',
+    detalle: 'Bowl de fideos ondulados listos en 3 minutos. Incluye sobre de caldo concentrado de res con notas de anís estrella, cebolleta y zanahoria.',
     precio: 12500,
   },
   {
     codigo: 5,
     titulo: 'Samyang Buldak Carbonara',
-    descripcion: 'Fideos coreanos picantes stir-fry fusionados con suave y cremosa salsa carbonara, queso mozzarella y un toque ardiente.',
-    detalle: 'Famoso plato coreano Buldak Bokkeummyun versión Carbo. Equilibrio perfecto entre el fuego del pollo picante coreano y la indulgencia de una salsa carbonara cremosa con queso y perejil.',
+    descripcion: 'Fideos picantes coreanos salteados con salsa carbonara cremosa, queso y un toque picante.',
+    detalle: 'Famoso ramen coreano Buldak Bokkeummyun Carbo. Balance entre el pollo picante coreano y salsa cremosa con queso y perejil.',
     precio: 14500,
   },
 ];
@@ -66,20 +64,18 @@ export const PRODUCTOS_BASE: Item[] = [
 export default function Catalogo() {
   const router = useRouter();
 
-  // Estados de la aplicación
   const [items, setItems] = useState<Item[]>([]);
   const [errorTexto, setErrorTexto] = useState('');
   const [cargando, setCargando] = useState(true);
   const [busqueda, setBusqueda] = useState('');
 
-  // Estados para modal de edición
+  // Modal de edicion
   const [editando, setEditando] = useState<Item | null>(null);
   const [editTitulo, setEditTitulo] = useState('');
   const [editPrecio, setEditPrecio] = useState('');
   const [editDesc, setEditDesc] = useState('');
   const [editDetalle, setEditDetalle] = useState('');
 
-  // Mapeo de imágenes para los 5 productos (reutiliza los 3 y añade las 2 de las fotos)
   const imagenes: Record<string, any> = {
     '1': require('../../../assets/images/tonkotsu.jpg'),
     '2': require('../../../assets/images/shoyu.png'),
@@ -88,19 +84,19 @@ export default function Catalogo() {
     '5': require('../../../assets/images/buldak-carbonara.jpg'),
   };
 
-  const badgesCategoria: Record<string, string> = {
-    '1': '⭐ Más Vendido',
-    '2': '🥢 Tradicional',
-    '3': '🍲 Especialidad',
-    '4': '🍜 Instantáneo',
-    '5': '🔥 Súper Picante',
+  const categorias: Record<string, string> = {
+    '1': 'Mas vendido',
+    '2': 'Tradicional',
+    '3': 'Especialidad',
+    '4': 'Instantaneo',
+    '5': 'Picante',
   };
 
   useEffect(() => {
     escanearCatalogo();
   }, []);
 
-  // Consultar productos almacenados en Supabase
+  // Consultar productos en Supabase usando select('*') para no fallar si falta alguna columna
   const escanearCatalogo = async () => {
     try {
       setCargando(true);
@@ -108,24 +104,21 @@ export default function Catalogo() {
 
       const { data, error } = await supabase
         .from('catalogo')
-        .select('codigo, titulo, descripcion, detalle, precio')
+        .select('*')
         .order('codigo', { ascending: true });
 
-      // Verificar errores de supabase
       if (error) {
-        console.error('Error Supabase:', error);
+        console.error('Error al consultar Supabase:', error);
         throw error;
       }
 
-      console.log('productos recibidos:', data);
       if (data && data.length > 0) {
         setItems(data as Item[]);
       } else {
-        // Si la tabla está vacía en Supabase, cargar los 5 base
         setItems(PRODUCTOS_BASE);
       }
     } catch (error: unknown) {
-      console.error('Error al cargar catalogo:', error);
+      console.log('Aviso al cargar de Supabase:', error);
       const mensaje =
         error instanceof Error
           ? error.message
@@ -133,39 +126,56 @@ export default function Catalogo() {
           ? String((error as any).message)
           : String(error);
 
-      setErrorTexto('No fue posible cargar de Supabase: ' + mensaje);
-      // Mantiene la app 100% funcional mostrando los 5 productos locales
+      // Si la columna detalle no existe en la tabla de Supabase, no mostramos un error molesto
+      if (!mensaje.includes('column catalogo.detalle does not exist')) {
+        setErrorTexto('Modo local: ' + mensaje);
+      }
       setItems(PRODUCTOS_BASE);
     } finally {
       setCargando(false);
     }
   };
 
-  // Función para insertar los 5 valores en la tabla de Supabase
+  // Insertar o sincronizar los 5 valores en Supabase
   const sincronizar5Valores = async () => {
     try {
       setCargando(true);
       setErrorTexto('');
 
-      const { error } = await supabase
+      // Intentar primero con todos los campos
+      let { error } = await supabase
         .from('catalogo')
         .upsert(PRODUCTOS_BASE, { onConflict: 'codigo' });
 
+      // Si la tabla aun no tiene la columna detalle, guardamos sin detalle para que no falle
+      if (error && error.message.includes('detalle')) {
+        const productosSinDetalle = PRODUCTOS_BASE.map(({ detalle, ...resto }) => resto);
+        const retry = await supabase
+          .from('catalogo')
+          .upsert(productosSinDetalle, { onConflict: 'codigo' });
+        error = retry.error;
+
+        if (!error) {
+          Alert.alert(
+            'Productos guardados',
+            'Los 5 productos se guardaron en Supabase. Si deseas guardar tambien la columna de detalles, ejecuta en el SQL Editor:\n\nALTER TABLE catalogo ADD COLUMN IF NOT EXISTS detalle TEXT;'
+          );
+          await escanearCatalogo();
+          return;
+        }
+      }
+
       if (error) {
         Alert.alert(
-          'Permiso RLS en Supabase Requerido',
-          'Ejecuta el archivo "scripts/permisos_y_catalogo.sql" en el SQL Editor de tu Supabase para permitir inserción y edición:\n\n' +
-            error.message
+          'Permiso o tabla en Supabase',
+          'Para habilitar permisos de insercion en Supabase, ejecuta el script "scripts/permisos_y_catalogo.sql" en tu panel de control:\n\n' + error.message
         );
       } else {
-        Alert.alert(
-          '¡Éxito!',
-          'Se insertaron y sincronizaron los 5 productos detallados en la tabla catálogo de Supabase.'
-        );
+        Alert.alert('Listo', 'Los 5 productos se han sincronizado con Supabase.');
         await escanearCatalogo();
       }
     } catch (err: any) {
-      Alert.alert('Error', err.message || 'No se pudo sincronizar');
+      Alert.alert('Aviso', err.message || 'No fue posible sincronizar');
     } finally {
       setCargando(false);
     }
@@ -174,49 +184,60 @@ export default function Catalogo() {
   // Guardar cambios al editar un producto
   const guardarEdicion = async () => {
     if (!editando || !editTitulo.trim() || !editPrecio.trim()) {
-      Alert.alert('Campos obligatorios', 'Por favor ingresa título y precio.');
+      Alert.alert('Campos requeridos', 'Por favor ingresa titulo y precio.');
       return;
     }
 
     const precioNum = parseFloat(editPrecio);
-    const camposActualizados = {
+    const camposConDetalle = {
       titulo: editTitulo,
       descripcion: editDesc,
       detalle: editDetalle,
       precio: precioNum,
     };
 
-    // Actualizar en Supabase
-    const { error } = await supabase
+    let { error } = await supabase
       .from('catalogo')
-      .update(camposActualizados)
+      .update(camposConDetalle)
       .eq('codigo', editando.codigo);
 
+    // Si la columna detalle aun no existe en la base remota, actualizamos sin detalle
+    if (error && error.message.includes('detalle')) {
+      const camposSinDetalle = {
+        titulo: editTitulo,
+        descripcion: editDesc,
+        precio: precioNum,
+      };
+      const retry = await supabase
+        .from('catalogo')
+        .update(camposSinDetalle)
+        .eq('codigo', editando.codigo);
+      error = retry.error;
+    }
+
+    // Actualizamos siempre el estado local de la app
+    setItems((prev) =>
+      prev.map((it) =>
+        it.codigo === editando.codigo
+          ? { ...it, ...camposConDetalle }
+          : it
+      )
+    );
+
     if (error) {
-      // Actualizar en el estado local de la app
-      setItems((prev) =>
-        prev.map((it) =>
-          it.codigo === editando.codigo
-            ? { ...it, ...camposActualizados }
-            : it
-        )
-      );
-      Alert.alert(
-        'Modificado Localmente',
-        'Se aplicó en la vista. Recuerda ejecutar el script SQL en Supabase para persistir cambios remotos.'
-      );
+      Alert.alert('Actualizado localmente', 'Se aplico el cambio en la pantalla.');
     } else {
-      Alert.alert('¡Actualizado!', 'Producto modificado exitosamente en Supabase.');
+      Alert.alert('Actualizado', 'Producto modificado correctamente en la base de datos.');
       escanearCatalogo();
     }
     setEditando(null);
   };
 
-  // Eliminar producto
+  // Eliminar un producto
   const confirmarEliminar = (codigo: string | number) => {
     Alert.alert(
-      'Eliminar Producto',
-      `¿Deseas eliminar el ítem con código #${codigo}?`,
+      'Eliminar producto',
+      `Deseas eliminar el producto #${codigo}?`,
       [
         { text: 'Cancelar', style: 'cancel' },
         {
@@ -228,9 +249,10 @@ export default function Catalogo() {
               .delete()
               .eq('codigo', codigo);
 
+            setItems((prev) => prev.filter((it) => it.codigo !== codigo));
+
             if (error) {
-              setItems((prev) => prev.filter((it) => it.codigo !== codigo));
-              Alert.alert('Eliminado localmente', 'Se retiró de la vista: ' + error.message);
+              Alert.alert('Aviso', 'Se retiro de la lista.');
             } else {
               Alert.alert('Eliminado', 'Producto eliminado de la base de datos.');
               escanearCatalogo();
@@ -241,7 +263,6 @@ export default function Catalogo() {
     );
   };
 
-  // Filtro de búsqueda como catálogo web
   const productosFiltrados = items.filter((prod) => {
     const texto = busqueda.toLowerCase().trim();
     if (!texto) return true;
@@ -254,61 +275,57 @@ export default function Catalogo() {
 
   return (
     <View style={styles.container}>
-      {/* Barra superior de navegación / Regresar */}
+      {/* Barra superior limpia */}
       <View style={styles.barraNavegacion}>
         <Pressable style={styles.btnRegresar} onPress={() => router.push('/')}>
-          <Text style={styles.btnRegresarTexto}>← Volver al Inicio</Text>
+          <Text style={styles.btnRegresarTexto}>Volver al inicio</Text>
         </Pressable>
-        <Text style={styles.badgeTienda}>🛒 Catálogo Online</Text>
+        <Text style={styles.badgeTienda}>Catalogo</Text>
       </View>
 
-      {/* Encabezado estilo tienda online */}
       <View style={styles.headerCatalogo}>
-        <Text style={styles.tituloHeader}>Menú & Catálogo Digital</Text>
+        <Text style={styles.tituloHeader}>Catalogo de productos</Text>
         <Text style={styles.subtituloHeader}>
-          {productosFiltrados.length} productos disponibles con entrega inmediata
+          {productosFiltrados.length} productos disponibles
         </Text>
 
-        {/* Buscador de productos */}
+        {/* Buscador sencillo */}
         <View style={styles.cajaBuscador}>
-          <Text style={styles.lupaIcono}>🔍</Text>
           <TextInput
             style={styles.inputBuscador}
-            placeholder="Buscar ramen por nombre, ingrediente o código..."
+            placeholder="Buscar por nombre, descripcion o codigo..."
             placeholderTextColor="#8D6E63"
             value={busqueda}
             onChangeText={setBusqueda}
           />
           {busqueda.length > 0 && (
             <Pressable onPress={() => setBusqueda('')}>
-              <Text style={styles.btnLimpiar}>✕</Text>
+              <Text style={styles.btnLimpiar}>Limpiar</Text>
             </Pressable>
           )}
         </View>
 
-        {/* Botones de acción: Escanear e Insertar */}
+        {/* Botones de control */}
         <View style={styles.filaAccionesTop}>
           <Pressable style={styles.btnEscanear} onPress={escanearCatalogo}>
-            <Text style={styles.btnEscanearTexto}>🔄 Escanear Catálogo</Text>
+            <Text style={styles.btnEscanearTexto}>Escanear catalogo</Text>
           </Pressable>
           <Pressable style={styles.btnInsertar} onPress={sincronizar5Valores}>
-            <Text style={styles.btnInsertarTexto}>➕ Insertar 5 Valores</Text>
+            <Text style={styles.btnInsertarTexto}>Insertar 5 valores</Text>
           </Pressable>
         </View>
 
-        {/* Mensaje de error / aviso si lo hay */}
         {!!errorTexto && (
           <View style={styles.bannerAviso}>
-            <Text style={styles.textoAviso}>⚠️ {errorTexto}</Text>
+            <Text style={styles.textoAviso}>{errorTexto}</Text>
           </View>
         )}
       </View>
 
-      {/* Indicador de carga o Lista de Productos */}
       {cargando ? (
         <View style={styles.centro}>
           <ActivityIndicator size="large" color="#BF360C" />
-          <Text style={styles.textoCargando}>Escaneando productos de Supabase...</Text>
+          <Text style={styles.textoCargando}>Cargando catalogo...</Text>
         </View>
       ) : (
         <FlatList
@@ -317,22 +334,20 @@ export default function Catalogo() {
           contentContainerStyle={styles.listaProductos}
           renderItem={({ item }) => {
             const img = imagenes[String(item.codigo)] || imagenes['1'];
-            const badgeTexto = badgesCategoria[String(item.codigo)] || '🍜 Ramen';
+            const cat = categorias[String(item.codigo)] || 'Ramen';
 
             return (
               <View style={styles.tarjeta}>
-                {/* Imagen del producto con badge de código y categoría */}
                 <View style={styles.contenedorImagenCard}>
                   <Image source={img} style={styles.imagenCard} resizeMode="cover" />
                   <View style={styles.badgeCategoria}>
-                    <Text style={styles.badgeCategoriaTexto}>{badgeTexto}</Text>
+                    <Text style={styles.badgeCategoriaTexto}>{cat}</Text>
                   </View>
                   <View style={styles.badgeCodigo}>
-                    <Text style={styles.badgeCodigoTexto}>CÓDIGO #{item.codigo}</Text>
+                    <Text style={styles.badgeCodigoTexto}>Codigo #{item.codigo}</Text>
                   </View>
                 </View>
 
-                {/* Detalles del producto */}
                 <View style={styles.infoCard}>
                   <Text style={styles.productoTitulo}>{item.titulo}</Text>
                   <Text style={styles.productoPrecio}>
@@ -344,12 +359,11 @@ export default function Catalogo() {
 
                   {!!item.detalle && (
                     <Text style={styles.productoDetallePreview} numberOfLines={2}>
-                      📌 {item.detalle}
+                      {item.detalle}
                     </Text>
                   )}
                 </View>
 
-                {/* Botones de acción del catálogo */}
                 <View style={styles.filaBotonesItem}>
                   <Pressable
                     style={styles.btnVerDetalle}
@@ -366,7 +380,7 @@ export default function Catalogo() {
                       })
                     }
                   >
-                    <Text style={styles.btnVerDetalleTexto}>👁️ Ver Detalle</Text>
+                    <Text style={styles.btnVerDetalleTexto}>Ver detalle</Text>
                   </Pressable>
 
                   <Pressable
@@ -379,14 +393,14 @@ export default function Catalogo() {
                       setEditDetalle(item.detalle || '');
                     }}
                   >
-                    <Text style={styles.btnEditarItemTexto}>✏️ Editar</Text>
+                    <Text style={styles.btnEditarItemTexto}>Editar</Text>
                   </Pressable>
 
                   <Pressable
                     style={styles.btnEliminarItem}
                     onPress={() => confirmarEliminar(item.codigo)}
                   >
-                    <Text style={styles.btnEliminarItemTexto}>🗑️</Text>
+                    <Text style={styles.btnEliminarItemTexto}>Eliminar</Text>
                   </Pressable>
                 </View>
               </View>
@@ -396,20 +410,20 @@ export default function Catalogo() {
             <View style={styles.vacioContainer}>
               <Text style={styles.vacioTexto}>No se encontraron productos.</Text>
               <Pressable style={styles.btnRecargar} onPress={escanearCatalogo}>
-                <Text style={styles.btnRecargarTexto}>Recargar Catálogo</Text>
+                <Text style={styles.btnRecargarTexto}>Recargar</Text>
               </Pressable>
             </View>
           }
         />
       )}
 
-      {/* Modal para Editar Producto */}
+      {/* Modal de edicion */}
       <Modal visible={!!editando} transparent animationType="slide">
         <View style={styles.modalFondo}>
           <View style={styles.modalContenedor}>
-            <Text style={styles.modalTitulo}>Editar Producto #{editando?.codigo}</Text>
+            <Text style={styles.modalTitulo}>Editar producto #{editando?.codigo}</Text>
 
-            <Text style={styles.modalLabel}>Título del Producto:</Text>
+            <Text style={styles.modalLabel}>Nombre del producto:</Text>
             <TextInput
               style={styles.modalInput}
               value={editTitulo}
@@ -423,27 +437,27 @@ export default function Catalogo() {
               value={editPrecio}
               onChangeText={setEditPrecio}
               keyboardType="numeric"
-              placeholder="Ej: 18000"
+              placeholder="18000"
             />
 
-            <Text style={styles.modalLabel}>Descripción General:</Text>
+            <Text style={styles.modalLabel}>Descripcion general:</Text>
             <TextInput
               style={[styles.modalInput, styles.modalArea]}
               value={editDesc}
               onChangeText={setEditDesc}
               multiline
               numberOfLines={3}
-              placeholder="Descripción breve"
+              placeholder="Descripcion breve"
             />
 
-            <Text style={styles.modalLabel}>Detalle y Preparación:</Text>
+            <Text style={styles.modalLabel}>Detalles de preparacion:</Text>
             <TextInput
               style={[styles.modalInput, styles.modalArea]}
               value={editDetalle}
               onChangeText={setEditDetalle}
               multiline
               numberOfLines={3}
-              placeholder="Ingredientes detallados y origen"
+              placeholder="Ingredientes detallados"
             />
 
             <View style={styles.modalBotones}>
@@ -454,7 +468,7 @@ export default function Catalogo() {
                 <Text style={styles.btnModalCancelarTexto}>Cancelar</Text>
               </Pressable>
               <Pressable style={styles.btnModalGuardar} onPress={guardarEdicion}>
-                <Text style={styles.btnModalGuardarTexto}>Guardar Cambios</Text>
+                <Text style={styles.btnModalGuardarTexto}>Guardar</Text>
               </Pressable>
             </View>
           </View>
@@ -467,7 +481,7 @@ export default function Catalogo() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF8DC', // Tono crema cálido
+    backgroundColor: '#FFF8DC',
   },
   centro: {
     flex: 1,
@@ -491,25 +505,25 @@ const styles = StyleSheet.create({
   },
   btnRegresar: {
     backgroundColor: '#FFE0B2',
-    paddingVertical: 8,
+    paddingVertical: 7,
     paddingHorizontal: 14,
-    borderRadius: 20,
-    borderWidth: 1.5,
+    borderRadius: 8,
+    borderWidth: 1,
     borderColor: '#BF360C',
   },
   btnRegresarTexto: {
     color: '#BF360C',
-    fontWeight: 'bold',
+    fontWeight: '600',
     fontSize: 13,
   },
   badgeTienda: {
     backgroundColor: '#BF360C',
     color: '#FFFFFF',
-    fontWeight: 'bold',
+    fontWeight: '600',
     fontSize: 12,
     paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 12,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
   headerCatalogo: {
     paddingHorizontal: 16,
@@ -531,15 +545,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+    borderRadius: 8,
     paddingHorizontal: 12,
-    borderWidth: 1.5,
-    borderColor: '#FFCCBC',
+    borderWidth: 1,
+    borderColor: '#D7CCC8',
     marginBottom: 10,
-  },
-  lupaIcono: {
-    fontSize: 16,
-    marginRight: 6,
   },
   inputBuscador: {
     flex: 1,
@@ -548,7 +558,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   btnLimpiar: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#8D6E63',
     padding: 4,
     fontWeight: 'bold',
@@ -560,44 +570,44 @@ const styles = StyleSheet.create({
   },
   btnEscanear: {
     backgroundColor: '#FFE0B2',
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: '#BF360C',
-    paddingVertical: 10,
+    paddingVertical: 9,
     paddingHorizontal: 8,
-    borderRadius: 12,
+    borderRadius: 8,
     flex: 1,
     marginRight: 6,
     alignItems: 'center',
   },
   btnInsertar: {
     backgroundColor: '#BF360C',
-    paddingVertical: 10,
+    paddingVertical: 9,
     paddingHorizontal: 8,
-    borderRadius: 12,
+    borderRadius: 8,
     flex: 1,
     marginLeft: 6,
     alignItems: 'center',
   },
   btnEscanearTexto: {
     color: '#BF360C',
-    fontWeight: 'bold',
+    fontWeight: '600',
     fontSize: 12,
   },
   btnInsertarTexto: {
     color: '#FFFFFF',
-    fontWeight: 'bold',
+    fontWeight: '600',
     fontSize: 12,
   },
   bannerAviso: {
     backgroundColor: '#FFF3E0',
     padding: 8,
-    borderRadius: 8,
+    borderRadius: 6,
     marginTop: 4,
-    borderLeftWidth: 4,
+    borderLeftWidth: 3,
     borderLeftColor: '#FF9800',
   },
   textoAviso: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#E65100',
     fontWeight: '500',
   },
@@ -608,20 +618,16 @@ const styles = StyleSheet.create({
   },
   tarjeta: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    marginBottom: 16,
+    borderRadius: 12,
+    marginBottom: 14,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 6,
-    elevation: 3,
     borderWidth: 1,
-    borderColor: '#FFE0B2',
+    borderColor: '#EFEBE9',
+    elevation: 2,
   },
   contenedorImagenCard: {
     width: '100%',
-    height: 180,
+    height: 170,
     backgroundColor: '#FAFAFA',
     position: 'relative',
   },
@@ -634,58 +640,57 @@ const styles = StyleSheet.create({
     top: 10,
     left: 10,
     backgroundColor: 'rgba(62, 39, 35, 0.85)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
   },
   badgeCategoriaTexto: {
     color: '#FFFFFF',
     fontSize: 11,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   badgeCodigo: {
     position: 'absolute',
     top: 10,
     right: 10,
     backgroundColor: '#BF360C',
-    paddingHorizontal: 9,
-    paddingVertical: 4,
-    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
   },
   badgeCodigoTexto: {
     color: '#FFFFFF',
     fontSize: 11,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   infoCard: {
     padding: 14,
   },
   productoTitulo: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: 'bold',
     color: '#3E2723',
     marginBottom: 4,
   },
   productoPrecio: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#E64A19',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   productoDescripcion: {
     fontSize: 13,
     color: '#5D4037',
     lineHeight: 18,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   productoDetallePreview: {
     fontSize: 12,
     color: '#795548',
     lineHeight: 16,
-    fontStyle: 'italic',
     backgroundColor: '#FFF8E1',
     padding: 6,
-    borderRadius: 8,
+    borderRadius: 6,
   },
   filaBotonesItem: {
     flexDirection: 'row',
@@ -696,39 +701,38 @@ const styles = StyleSheet.create({
   },
   btnVerDetalle: {
     backgroundColor: '#E64A19',
-    flex: 2,
-    paddingVertical: 10,
-    borderRadius: 10,
+    flex: 1.5,
+    paddingVertical: 8,
+    borderRadius: 8,
     alignItems: 'center',
   },
   btnVerDetalleTexto: {
     color: '#FFFFFF',
-    fontWeight: 'bold',
+    fontWeight: '600',
     fontSize: 13,
   },
   btnEditarItem: {
     backgroundColor: '#1976D2',
-    flex: 1.2,
-    paddingVertical: 10,
-    borderRadius: 10,
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 8,
     alignItems: 'center',
   },
   btnEditarItemTexto: {
     color: '#FFFFFF',
-    fontWeight: 'bold',
+    fontWeight: '600',
     fontSize: 13,
   },
   btnEliminarItem: {
     backgroundColor: '#D32F2F',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 10,
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 8,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   btnEliminarItemTexto: {
     color: '#FFFFFF',
-    fontWeight: 'bold',
+    fontWeight: '600',
     fontSize: 13,
   },
   vacioContainer: {
@@ -737,54 +741,54 @@ const styles = StyleSheet.create({
   },
   vacioTexto: {
     color: '#8D6E63',
-    fontSize: 15,
+    fontSize: 14,
     marginBottom: 12,
   },
   btnRecargar: {
     backgroundColor: '#BF360C',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 18,
+    borderRadius: 8,
   },
   btnRecargarTexto: {
     color: '#FFF',
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   modalFondo: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     padding: 20,
   },
   modalContenedor: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 20,
+    borderRadius: 12,
+    padding: 18,
     maxHeight: '90%',
   },
   modalTitulo: {
-    fontSize: 19,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#3E2723',
-    marginBottom: 14,
+    marginBottom: 12,
     textAlign: 'center',
   },
   modalLabel: {
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: '#5D4037',
     marginBottom: 3,
   },
   modalInput: {
     backgroundColor: '#FBE9E7',
     borderRadius: 8,
-    padding: 9,
+    padding: 8,
     fontSize: 13,
     color: '#3E2723',
     marginBottom: 10,
   },
   modalArea: {
-    height: 60,
+    height: 55,
     textAlignVertical: 'top',
   },
   modalBotones: {
@@ -793,22 +797,22 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   btnModalCancelar: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
     marginRight: 8,
   },
   btnModalCancelarTexto: {
     color: '#757575',
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   btnModalGuardar: {
     backgroundColor: '#BF360C',
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
   },
   btnModalGuardarTexto: {
     color: '#FFFFFF',
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
 });

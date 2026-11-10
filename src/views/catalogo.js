@@ -14,41 +14,40 @@ import {
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
 
-// Entidad con los 5 productos con información detallada
 export const CATALOGO_BASE = [
   {
     codigo: 1,
     titulo: 'Tonkotsu Ramen Tradicional',
-    descripcion: 'Caldo denso y cremoso de cerdo hervido durante 16 horas, fideos artesanales, panceta chashu marinada, huevo nitamago y alga nori.',
-    detalle: 'Especialidad de la casa con fondo de huesos de cerdo blanco a fuego lento, aceite de ajo negro aromático (mayu), brotes de bambú (menma), cebolleta fresca y chashu braseado.',
+    descripcion: 'Caldo de cerdo cocinado a fuego lento por 16 horas, fideos artesanales, chashu y huevo marinado.',
+    detalle: 'Preparado con fondo de cerdo blanco a fuego lento, aceite de ajo negro aromático, brotes de bambú, cebolleta fresca y chashu braseado.',
     precio: 18000,
   },
   {
     codigo: 2,
     titulo: 'Shoyu Ramen Clásico de Tokyo',
-    descripcion: 'Caldo límpido y profundo a base de soja fermentada artesanal, pollo de corral, menma crujiente y cebolleta fina.',
-    detalle: 'El clásico de Tokyo con caldo transparente elaborado con alga kombu, setas shiitake y tare de salsa shoyu añejada en barrica de cedro, con pollo tierno y huevo marinado en mirin.',
+    descripcion: 'Caldo ligero a base de salsa de soja fermentada, pollo de corral, bambú y cebolleta fina.',
+    detalle: 'Receta tradicional con caldo transparente elaborado con alga kombu, setas shiitake y salsa shoyu añejada, pechuga tierna y huevo suave.',
     precio: 15500,
   },
   {
     codigo: 3,
     titulo: 'Miso Ramen Hokkaido',
-    descripcion: 'Caldo aromático enriquecido con pasta de miso tostada de Hokkaido, mantequilla dulce, maíz tierno y carne picada.',
-    detalle: 'Originario de Sapporo, con base de pasta de miso rojo y blanco salteada al wok con jengibre fresco, ajo confitado, sésamo tostado, maíz dulce y una lágrima de mantequilla pura.',
+    descripcion: 'Caldo aromático con pasta de miso tostada, maíz tierno, mantequilla y carne picada.',
+    detalle: 'Originario de Sapporo, con pasta de miso salteada con jengibre fresco, ajo confitado, sésamo tostado, maíz dulce y mantequilla pura.',
     precio: 17000,
   },
   {
     codigo: 4,
     titulo: 'Bogia Instant Noodles Beef Flavor',
-    descripcion: 'Fideos instantáneos premium en bowl sabor carne de res especiada con trozos de vegetales deshidratados y caldo vigorizante.',
-    detalle: 'Bowl de fideos ondulados listos en 3 minutos. Incluye sobre de caldo concentrado de res estilo oriental con notas de anís estrella, cebolla de verdeo deshidratada, zanahoria y chile suave.',
+    descripcion: 'Fideos instantáneos en bowl con caldo especiado de res y vegetales deshidratados.',
+    detalle: 'Bowl de fideos ondulados listos en 3 minutos. Incluye sobre de caldo concentrado de res con notas de anís estrella, cebolleta y zanahoria.',
     precio: 12500,
   },
   {
     codigo: 5,
     titulo: 'Samyang Buldak Carbonara',
-    descripcion: 'Fideos coreanos picantes stir-fry fusionados con suave y cremosa salsa carbonara, queso mozzarella y un toque ardiente.',
-    detalle: 'Famoso plato coreano Buldak Bokkeummyun versión Carbo. Equilibrio perfecto entre el fuego del pollo picante coreano y la indulgencia de una salsa carbonara cremosa con queso y perejil.',
+    descripcion: 'Fideos picantes coreanos salteados con salsa carbonara cremosa, queso y un toque picante.',
+    detalle: 'Famoso ramen coreano Buldak Bokkeummyun Carbo. Balance entre el pollo picante coreano y salsa cremosa con queso y perejil.',
     precio: 14500,
   },
 ];
@@ -76,17 +75,15 @@ export default function CatalogoJS() {
     escanearCatalogo();
   }, []);
 
-  // Escanear / Consultar los datos de la tabla catálogo
   const escanearCatalogo = async () => {
     try {
       setCargando(true);
       const { data, error } = await supabase
         .from('catalogo')
-        .select('codigo, titulo, descripcion, detalle, precio')
+        .select('*')
         .order('codigo', { ascending: true });
 
       if (error) {
-        console.log('Error al consultar catálogo en Supabase:', error.message);
         setItems(CATALOGO_BASE);
       } else if (data && data.length > 0) {
         setItems(data);
@@ -94,28 +91,29 @@ export default function CatalogoJS() {
         setItems(CATALOGO_BASE);
       }
     } catch (e) {
-      console.log('Error de red o ejecución:', e);
       setItems(CATALOGO_BASE);
     } finally {
       setCargando(false);
     }
   };
 
-  // Insertar los 5 valores en Supabase
   const insertarCincoValores = async () => {
     try {
       setCargando(true);
-      const { error } = await supabase
+      let { error } = await supabase
         .from('catalogo')
         .upsert(CATALOGO_BASE, { onConflict: 'codigo' });
 
+      if (error && error.message.includes('detalle')) {
+        const sinDetalle = CATALOGO_BASE.map(({ detalle, ...resto }) => resto);
+        const retry = await supabase.from('catalogo').upsert(sinDetalle, { onConflict: 'codigo' });
+        error = retry.error;
+      }
+
       if (error) {
-        Alert.alert(
-          'Permiso RLS Requerido',
-          'Ejecuta el script SQL en Supabase para habilitar permisos: ' + error.message
-        );
+        Alert.alert('Aviso', 'Para habilitar permisos ejecute el script SQL: ' + error.message);
       } else {
-        Alert.alert('Éxito', 'Se sincronizaron los 5 productos en Supabase.');
+        Alert.alert('Exito', 'Productos sincronizados con Supabase.');
         escanearCatalogo();
       }
     } catch (e) {
@@ -125,15 +123,14 @@ export default function CatalogoJS() {
     }
   };
 
-  // Guardar edición
   const guardarEdicion = async () => {
     if (!itemEditando || !nuevoTitulo.trim() || !nuevoPrecio.trim()) {
-      Alert.alert('Error', 'Completa los campos obligatorios');
+      Alert.alert('Campos requeridos', 'Por favor ingresa titulo y precio');
       return;
     }
 
     const precioNum = parseFloat(nuevoPrecio);
-    const { error } = await supabase
+    let { error } = await supabase
       .from('catalogo')
       .update({
         titulo: nuevoTitulo,
@@ -143,45 +140,42 @@ export default function CatalogoJS() {
       })
       .eq('codigo', itemEditando.codigo);
 
-    if (error) {
-      setItems((prev) =>
-        prev.map((i) =>
-          i.codigo === itemEditando.codigo
-            ? { ...i, titulo: nuevoTitulo, descripcion: nuevaDesc, detalle: nuevoDetalle, precio: precioNum }
-            : i
-        )
-      );
-      Alert.alert('Nota', 'Actualizado localmente en la vista: ' + error.message);
-    } else {
-      Alert.alert('Éxito', 'Producto actualizado en Supabase');
-      escanearCatalogo();
+    if (error && error.message.includes('detalle')) {
+      const retry = await supabase
+        .from('catalogo')
+        .update({
+          titulo: nuevoTitulo,
+          descripcion: nuevaDesc,
+          precio: precioNum,
+        })
+        .eq('codigo', itemEditando.codigo);
+      error = retry.error;
     }
+
+    setItems((prev) =>
+      prev.map((i) =>
+        i.codigo === itemEditando.codigo
+          ? { ...i, titulo: nuevoTitulo, descripcion: nuevaDesc, detalle: nuevoDetalle, precio: precioNum }
+          : i
+      )
+    );
+
+    Alert.alert('Listo', 'Producto actualizado.');
     setItemEditando(null);
   };
 
-  // Eliminar un ítem
   const eliminarItem = async (codigo) => {
     Alert.alert(
-      'Confirmar eliminación',
-      `¿Deseas eliminar el ítem #${codigo}?`,
+      'Confirmar eliminacion',
+      `Deseas eliminar el item #${codigo}?`,
       [
         { text: 'Cancelar', style: 'cancel' },
         {
           text: 'Eliminar',
           style: 'destructive',
           onPress: async () => {
-            const { error } = await supabase
-              .from('catalogo')
-              .delete()
-              .eq('codigo', codigo);
-
-            if (error) {
-              setItems((prev) => prev.filter((i) => i.codigo !== codigo));
-              Alert.alert('Nota', 'Eliminado localmente: ' + error.message);
-            } else {
-              Alert.alert('Éxito', 'Producto eliminado en Supabase');
-              escanearCatalogo();
-            }
+            await supabase.from('catalogo').delete().eq('codigo', codigo);
+            setItems((prev) => prev.filter((i) => i.codigo !== codigo));
           },
         },
       ]
@@ -200,21 +194,19 @@ export default function CatalogoJS() {
 
   return (
     <View style={styles.container}>
-      {/* Botón de regreso */}
       <View style={styles.topBar}>
         <Pressable style={styles.btnVolver} onPress={() => router.push('/')}>
-          <Text style={styles.btnVolverTexto}>← Regresar al Inicio</Text>
+          <Text style={styles.btnVolverTexto}>Volver al inicio</Text>
         </Pressable>
-        <Text style={styles.badgeFormato}>Formato .JS</Text>
+        <Text style={styles.badgeFormato}>Version JS</Text>
       </View>
 
-      <Text style={styles.titulo}>Catálogo de Productos (JS)</Text>
-      <Text style={styles.subtitulo}>Entidad de 5 productos con permisos CRUD y escaneo</Text>
+      <Text style={styles.titulo}>Catalogo de productos (JS)</Text>
+      <Text style={styles.subtitulo}>Consulta y gestion de 5 productos</Text>
 
-      {/* Buscador */}
       <TextInput
         style={styles.buscador}
-        placeholder="🔍 Buscar en el catálogo..."
+        placeholder="Buscar en el catalogo..."
         placeholderTextColor="#8D6E63"
         value={busqueda}
         onChangeText={setBusqueda}
@@ -222,10 +214,10 @@ export default function CatalogoJS() {
 
       <View style={styles.botonesAccion}>
         <Pressable style={styles.btnEscanear} onPress={escanearCatalogo}>
-          <Text style={styles.btnTexto}>🔄 Escanear Catálogo</Text>
+          <Text style={styles.btnTexto}>Escanear catalogo</Text>
         </Pressable>
         <Pressable style={styles.btnInsertar} onPress={insertarCincoValores}>
-          <Text style={styles.btnTextoBlanco}>➕ Insertar 5 Valores</Text>
+          <Text style={styles.btnTextoBlanco}>Insertar 5 valores</Text>
         </Pressable>
       </View>
 
@@ -252,7 +244,7 @@ export default function CatalogoJS() {
                   <Text style={styles.descItem}>{item.descripcion}</Text>
 
                   {!!item.detalle && (
-                    <Text style={styles.detalleItem}>📌 {item.detalle}</Text>
+                    <Text style={styles.detalleItem}>{item.detalle}</Text>
                   )}
 
                   <View style={styles.filaAcciones}>
@@ -271,7 +263,7 @@ export default function CatalogoJS() {
                         })
                       }
                     >
-                      <Text style={styles.btnTextoBlanco}>Ver Detalle</Text>
+                      <Text style={styles.btnTextoBlanco}>Ver detalle</Text>
                     </Pressable>
 
                     <Pressable
@@ -291,7 +283,7 @@ export default function CatalogoJS() {
                       style={styles.btnEliminar}
                       onPress={() => eliminarItem(item.codigo)}
                     >
-                      <Text style={styles.btnTextoBlanco}>🗑️</Text>
+                      <Text style={styles.btnTextoBlanco}>Eliminar</Text>
                     </Pressable>
                   </View>
                 </View>
@@ -301,16 +293,16 @@ export default function CatalogoJS() {
         />
       )}
 
-      {/* Modal de edición */}
+      {/* Modal */}
       <Modal visible={!!itemEditando} transparent animationType="slide">
         <View style={styles.modalFondo}>
           <View style={styles.modalContenido}>
-            <Text style={styles.modalTitulo}>Editar Producto #{itemEditando?.codigo}</Text>
+            <Text style={styles.modalTitulo}>Editar producto #{itemEditando?.codigo}</Text>
             <TextInput
               style={styles.input}
               value={nuevoTitulo}
               onChangeText={setNuevoTitulo}
-              placeholder="Título"
+              placeholder="Titulo"
             />
             <TextInput
               style={styles.input}
@@ -320,14 +312,14 @@ export default function CatalogoJS() {
               keyboardType="numeric"
             />
             <TextInput
-              style={[styles.input, { height: 50 }]}
+              style={[styles.input, { height: 45 }]}
               value={nuevaDesc}
               onChangeText={setNuevaDesc}
-              placeholder="Descripción"
+              placeholder="Descripcion"
               multiline
             />
             <TextInput
-              style={[styles.input, { height: 50 }]}
+              style={[styles.input, { height: 45 }]}
               value={nuevoDetalle}
               onChangeText={setNuevoDetalle}
               placeholder="Detalle"
@@ -358,69 +350,69 @@ const styles = StyleSheet.create({
   },
   btnVolver: {
     backgroundColor: '#FFE0B2',
-    paddingVertical: 7,
+    paddingVertical: 6,
     paddingHorizontal: 12,
-    borderRadius: 16,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#BF360C',
   },
   btnVolverTexto: {
     color: '#BF360C',
-    fontWeight: 'bold',
+    fontWeight: '600',
     fontSize: 12,
   },
   badgeFormato: {
     backgroundColor: '#3E2723',
     color: '#FFF',
     fontSize: 11,
-    fontWeight: 'bold',
+    fontWeight: '600',
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 8,
+    borderRadius: 6,
   },
-  titulo: { fontSize: 24, fontWeight: 'bold', color: '#3E2723', textAlign: 'center' },
+  titulo: { fontSize: 22, fontWeight: 'bold', color: '#3E2723', textAlign: 'center' },
   subtitulo: { fontSize: 13, color: '#D84315', textAlign: 'center', marginBottom: 12 },
   buscador: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 8,
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 7,
     borderWidth: 1,
-    borderColor: '#FFCCBC',
+    borderColor: '#D7CCC8',
     color: '#3E2723',
     marginBottom: 10,
   },
-  botonesAccion: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
-  btnEscanear: { backgroundColor: '#FF8A65', padding: 10, borderRadius: 10, flex: 1, marginRight: 6, alignItems: 'center' },
-  btnInsertar: { backgroundColor: '#BF360C', padding: 10, borderRadius: 10, flex: 1, marginLeft: 6, alignItems: 'center' },
-  btnTexto: { color: '#3E2723', fontWeight: 'bold', fontSize: 12 },
-  btnTextoBlanco: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 12 },
+  botonesAccion: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
+  btnEscanear: { backgroundColor: '#FF8A65', padding: 9, borderRadius: 8, flex: 1, marginRight: 5, alignItems: 'center' },
+  btnInsertar: { backgroundColor: '#BF360C', padding: 9, borderRadius: 8, flex: 1, marginLeft: 5, alignItems: 'center' },
+  btnTexto: { color: '#3E2723', fontWeight: '600', fontSize: 12 },
+  btnTextoBlanco: { color: '#FFFFFF', fontWeight: '600', fontSize: 12 },
   tarjeta: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    marginBottom: 14,
+    borderRadius: 10,
+    marginBottom: 12,
     overflow: 'hidden',
-    elevation: 2,
     borderWidth: 1,
-    borderColor: '#FFE0B2',
+    borderColor: '#EFEBE9',
+    elevation: 1,
   },
-  tarjetaImg: { width: '100%', height: 160 },
-  tarjetaBody: { padding: 14 },
+  tarjetaImg: { width: '100%', height: 150 },
+  tarjetaBody: { padding: 12 },
   headerTarjeta: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
-  badgeCodigo: { backgroundColor: '#BF360C', color: '#FFF', paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6, fontWeight: 'bold', marginRight: 8, fontSize: 11 },
-  nombreItem: { fontSize: 17, fontWeight: 'bold', color: '#3E2723', flex: 1 },
+  badgeCodigo: { backgroundColor: '#BF360C', color: '#FFF', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, fontWeight: 'bold', marginRight: 6, fontSize: 11 },
+  nombreItem: { fontSize: 16, fontWeight: 'bold', color: '#3E2723', flex: 1 },
   descItem: { fontSize: 13, color: '#5D4037', marginBottom: 6, lineHeight: 18 },
-  detalleItem: { fontSize: 12, color: '#795548', fontStyle: 'italic', marginBottom: 8, backgroundColor: '#FFF8E1', padding: 6, borderRadius: 6 },
-  precioItem: { fontSize: 16, fontWeight: 'bold', color: '#E64A19', marginBottom: 8 },
+  detalleItem: { fontSize: 12, color: '#795548', marginBottom: 8, backgroundColor: '#FFF8E1', padding: 6, borderRadius: 6 },
+  precioItem: { fontSize: 15, fontWeight: 'bold', color: '#E64A19', marginBottom: 8 },
   filaAcciones: { flexDirection: 'row', justifyContent: 'space-between', gap: 6 },
-  btnDetalle: { backgroundColor: '#FF7043', paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8, flex: 1.5, alignItems: 'center' },
-  btnEditar: { backgroundColor: '#1976D2', paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8, flex: 1, alignItems: 'center' },
-  btnEliminar: { backgroundColor: '#D32F2F', paddingVertical: 8, paddingHorizontal: 10, borderRadius: 8, alignItems: 'center' },
+  btnDetalle: { backgroundColor: '#FF7043', paddingVertical: 7, paddingHorizontal: 10, borderRadius: 6, flex: 1.2, alignItems: 'center' },
+  btnEditar: { backgroundColor: '#1976D2', paddingVertical: 7, paddingHorizontal: 10, borderRadius: 6, flex: 1, alignItems: 'center' },
+  btnEliminar: { backgroundColor: '#D32F2F', paddingVertical: 7, paddingHorizontal: 10, borderRadius: 6, flex: 1, alignItems: 'center' },
   modalFondo: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 20 },
-  modalContenido: { backgroundColor: '#FFF', padding: 20, borderRadius: 14 },
-  modalTitulo: { fontSize: 18, fontWeight: 'bold', marginBottom: 12, color: '#3E2723' },
-  input: { borderWidth: 1, borderColor: '#DDD', borderRadius: 8, padding: 8, marginBottom: 10, fontSize: 13 },
-  modalBotones: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 8 },
-  btnCancelar: { padding: 10, marginRight: 10 },
-  btnGuardar: { backgroundColor: '#BF360C', paddingVertical: 10, paddingHorizontal: 16, borderRadius: 8 },
+  modalContenido: { backgroundColor: '#FFF', padding: 18, borderRadius: 10 },
+  modalTitulo: { fontSize: 17, fontWeight: 'bold', marginBottom: 10, color: '#3E2723' },
+  input: { borderWidth: 1, borderColor: '#D7CCC8', borderRadius: 6, padding: 7, marginBottom: 8, fontSize: 13 },
+  modalBotones: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 6 },
+  btnCancelar: { padding: 8, marginRight: 8 },
+  btnGuardar: { backgroundColor: '#BF360C', paddingVertical: 8, paddingHorizontal: 14, borderRadius: 6 },
 });

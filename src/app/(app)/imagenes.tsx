@@ -13,8 +13,8 @@ export default function ImagenesScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.titulo}>Galería de Ramen</Text>
-      <Text style={styles.descripcion}>Descubre nuestros 5 platillos y presentaciones</Text>
+      <Text style={styles.titulo}>Galeria de platos</Text>
+      <Text style={styles.descripcion}>Presentaciones de nuestros 5 productos</Text>
 
       {imagenes.map((img) => (
         <View key={img.id} style={styles.tarjeta}>
@@ -24,7 +24,7 @@ export default function ImagenesScreen() {
       ))}
 
       <Pressable style={styles.boton} onPress={() => router.replace('/')}>
-        <Text style={styles.botonTexto}>← Volver al inicio</Text>
+        <Text style={styles.botonTexto}>Volver al inicio</Text>
       </Pressable>
     </ScrollView>
   );
@@ -39,58 +39,54 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   titulo: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#3E2723',
-    marginTop: 10,
+    marginTop: 8,
   },
   descripcion: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#5D4037',
-    marginBottom: 20,
+    marginBottom: 16,
     textAlign: 'center',
   },
   tarjeta: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 15,
-    marginBottom: 20,
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 16,
     alignItems: 'center',
     width: '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    elevation: 1,
     borderWidth: 1,
-    borderColor: '#FFE0B2',
+    borderColor: '#EFEBE9',
   },
   imagen: {
     width: '100%',
-    height: 220,
-    borderRadius: 12,
-    marginBottom: 10,
+    height: 200,
+    borderRadius: 8,
+    marginBottom: 8,
     backgroundColor: '#FAFAFA',
   },
   nombre: {
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: 'bold',
     color: '#BF360C',
     textAlign: 'center',
   },
   boton: {
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: '#BF360C',
     backgroundColor: '#FFFFFF',
-    padding: 15,
-    borderRadius: 12,
+    padding: 12,
+    borderRadius: 8,
     alignItems: 'center',
     width: '100%',
-    marginTop: 10,
+    marginTop: 8,
   },
   botonTexto: {
     color: '#BF360C',
-    fontWeight: 'bold',
-    fontSize: 16,
+    fontWeight: '600',
+    fontSize: 14,
   },
 });
